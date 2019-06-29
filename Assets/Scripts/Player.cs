@@ -64,6 +64,7 @@ public class Player : Singleton<Player>
 		if(_canJump && Input.GetKeyDown(KeyCode.Space))
 		{
 			HandleJump();
+			AudioManager.Instance.PlayWhoosh();
 			_canJump = false;
 			_velocity = Vector2.zero;
 		}
@@ -114,6 +115,7 @@ public class Player : Singleton<Player>
 		{
 			var nc = other.GetComponent<Node>();
 			_gridPos = nc.GridPosition;
+			AudioManager.Instance.PlayCollect();
 			if(nc.NodeIndex > LevelGenerator.Instance.HighestNodeReached)
 			{
 				LevelGenerator.Instance.HighestNodeReached = nc.NodeIndex;
