@@ -8,6 +8,7 @@ public class Player : Singleton<Player>
 	public float Gravity = 1.0f;
 	public float AirResistance = 0.5f;
 	public float BoostDuration = 0.5f;
+	public float AltDelayTime = 0.5f;
 	
 	private bool _firstJump = true;
 	private bool _canJump = true;
@@ -16,6 +17,8 @@ public class Player : Singleton<Player>
 	private Vector3 _boostStart;
 	private Vector3 _boostDest;
 	private float _boostTime;
+	private float _altDelay;
+	private bool _waitingForAlt = false;
 
 	public bool FirstJump => _firstJump;
 
@@ -58,6 +61,13 @@ public class Player : Singleton<Player>
 
 	private void Update()
 	{
+		if(_waitingForAlt && Input.GetKeyDown(KeyCode.P))
+		{
+			_altDelay = 0;
+			_waitingForAlt = false;
+			_canJump = true;
+		}
+		
 		if(_canJump && Input.GetKeyDown(KeyCode.Space))
 		{
 			Debug.Log("jumping");
@@ -72,7 +82,7 @@ public class Player : Singleton<Player>
 		}
 
 		_velocity *= Vector2.one - (new Vector2(AirResistance, AirResistance) * Time.deltaTime);
-		
+
 		if(_boostTime > 0)
 		{
 			var boostPos = Util.Lerp(_boostDest, _boostStart, _boostTime / BoostDuration, Ease.InQuad);
@@ -80,7 +90,7 @@ public class Player : Singleton<Player>
 		}
 		else
 		{
-			if(!_firstJump)
+			if(!_firstJump && _altDelay <= 0)
 			{
 				_velocity -= new Vector2(0, Gravity) * Time.deltaTime;
 			}
@@ -93,7 +103,8 @@ public class Player : Singleton<Player>
 				Mathf.RoundToInt(localPosition.y / LevelGenerator.Instance.HeightMult)
 			);
 		}
-		
+
+		_altDelay -= Time.deltaTime;
 		_boostTime -= Time.deltaTime;
 	}
 
@@ -103,7 +114,20 @@ public class Player : Singleton<Player>
 		{
 			var nc = other.GetComponent<Node>();
 			_gridPos = nc.GridPosition;
-			_canJump = true;
+			if(nc.NodeIndex > LevelGenerator.Instance.HighestNodeReached)
+			{
+				LevelGenerator.Instance.HighestNodeReached = nc.NodeIndex;
+			}
+
+			if(nc.AltNode)
+			{
+				_altDelay = AltDelayTime;
+				_waitingForAlt = true;
+			}
+			else
+			{
+				_canJump = true;
+			}
 			Destroy(other.gameObject);
 		}
 	}
