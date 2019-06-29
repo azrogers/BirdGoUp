@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : Singleton<LevelGenerator>
 {
 	public GameObject NodePrefab;
 
@@ -12,6 +12,12 @@ public class LevelGenerator : MonoBehaviour
 
 	public float WidthMult = 1.0f;
 	public float HeightMult = 1.0f;
+
+	private List<Node> _createdNodes = new List<Node>();
+
+	public Vector2 GetPosFor(Vector2Int a) => a * new Vector2(WidthMult, HeightMult);
+
+	public bool PosFilled(Vector2Int a) => _grid.Contains(a);
 
 	private void Generate(Vector2Int startingPoint, int num, bool firstGenerated)
 	{
@@ -27,34 +33,6 @@ public class LevelGenerator : MonoBehaviour
 				new Vector2Int(lastPoint.x + 1, lastPoint.y + 1),
 				new Vector2Int(lastPoint.x - 1, lastPoint.y + 1),
 			};
-
-			/*if(firstGenerated)
-			{
-				possibilities = new List<Vector2Int>()
-				{
-					new Vector2Int(lastPoint.x - 1, lastPoint.y),
-					new Vector2Int(lastPoint.x + 1, lastPoint.y),
-					new Vector2Int(lastPoint.x, lastPoint.y + 1),
-					new Vector2Int(lastPoint.x + 1, lastPoint.y + 1),
-					new Vector2Int(lastPoint.x - 1, lastPoint.y + 1),
-				};
-
-				firstGenerated = false;
-			}
-			else
-			{
-				possibilities = new List<Vector2Int>()
-				{
-					new Vector2Int(lastPoint.x - 1, lastPoint.y),
-					new Vector2Int(lastPoint.x + 1, lastPoint.y),
-					new Vector2Int(lastPoint.x, lastPoint.y + 1),
-					new Vector2Int(lastPoint.x + 1, lastPoint.y + 1),
-					new Vector2Int(lastPoint.x - 1, lastPoint.y + 1),
-					new Vector2Int(lastPoint.x + 1, lastPoint.y - 1),
-					new Vector2Int(lastPoint.x - 1, lastPoint.y - 1),
-					new Vector2Int(lastPoint.x, lastPoint.y - 1)
-				};
-			}*/
 
 			possibilities = possibilities.OrderBy(p => Random.value).ToList();
 
@@ -80,6 +58,14 @@ public class LevelGenerator : MonoBehaviour
 			}
 		}
 
+		// fill in the position of the last node of the previously generated nodes
+		if(_createdNodes.Any())
+		{
+			var lastNode = _createdNodes.Last();
+			lastNode.NextNode = nodes[0];
+			lastNode.UpdateRotation();
+		}
+
 		// create each node
 		for(var i = 0; i < nodes.Length; i++)
 		{
@@ -87,6 +73,16 @@ public class LevelGenerator : MonoBehaviour
 			var nodeObj = Instantiate(NodePrefab, transform);
 			nodeObj.transform.localPosition = new Vector3(n.x * WidthMult, n.y * HeightMult);
 			nodeObj.name = $"Node {i}";
+
+			var nc = nodeObj.GetComponent<Node>();
+			nc.GridPosition = n;
+			if(i != nodes.Length - 1)
+			{
+				nc.NextNode = nodes[i + 1];
+				nc.UpdateRotation();
+			}
+
+			_createdNodes.Add(nc);
 		}
 	}
 
