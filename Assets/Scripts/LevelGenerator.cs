@@ -9,6 +9,7 @@ public class LevelGenerator : Singleton<LevelGenerator>
 	private static int _seed = -1;
 	
 	public GameObject NodePrefab;
+	public GameObject ObstaclePrefab;
 
 	private HashSet<Vector2Int> _grid = new HashSet<Vector2Int>();
 
@@ -19,6 +20,7 @@ public class LevelGenerator : Singleton<LevelGenerator>
 	private List<Node> _createdNodes = new List<Node>();
 	private int _nextNodeIndex = 0;
 	private int _nextGenPoint = 0;
+	private Dictionary<Vector2Int, int> _posIndexes = new Dictionary<Vector2Int, int>();
 
 	[NonSerialized] public int HighestNodeReached = 0;
 
@@ -57,6 +59,7 @@ public class LevelGenerator : Singleton<LevelGenerator>
 				nodes[i] = p;
 				lastPoint = p;
 				_grid.Add(p);
+				_posIndexes[p] = startIndex + i;
 				foundPlace = true;
 				break;
 			}
@@ -75,6 +78,43 @@ public class LevelGenerator : Singleton<LevelGenerator>
 			lastNode.UpdateVisual();
 		}
 
+		var lastNodePos = _createdNodes.Any() ? _createdNodes.Last().GridPosition : Vector2Int.zero;
+		for(var i = 0; i < nodes.Length - 1; i++)
+		{
+			var node = nodes[i];
+			var nextNode = nodes[i + 1];
+			if(i > 0)
+			{
+				lastNodePos = nodes[i - 1];
+			}
+			// if this node has any neighbors that aren't its next position,
+			// maybe put an obstacle between them
+			var neighbors = new[]
+			{
+				new Vector2Int(node.x - 1, node.y),
+				new Vector2Int(node.x + 1, node.y),
+				new Vector2Int(node.x, node.y - 1),
+				new Vector2Int(node.x, node.y + 1)
+			};
+
+			foreach(var n in neighbors.Where(n => _grid.Contains(n) && n != nextNode && n != lastNodePos))
+			{
+				if(!(rand.NextDouble() > 0.5f))
+				{
+					continue;
+				}
+
+				var indexFrom = Mathf.Min(_posIndexes[node], _posIndexes[n]);
+				var obst = Instantiate(ObstaclePrefab, transform);
+				// position half way between
+				obst.transform.localPosition = Vector2.Lerp(GetPosFor(node), GetPosFor(n), 0.5f);
+				var oc = obst.GetComponent<Obstacle>();
+				oc.PosFrom = node;
+				oc.PosBlockingTo = n;
+				oc.IndexFrom = Mathf.Min(_posIndexes[node], _posIndexes[n]);
+			}
+		}
+
 		// create each node
 		for(var i = 0; i < nodes.Length; i++)
 		{
@@ -84,14 +124,13 @@ public class LevelGenerator : Singleton<LevelGenerator>
 
 			var nc = nodeObj.GetComponent<Node>();
 			nc.GridPosition = n;
-			nc.AltNode = rand.NextDouble() > 0.3f;
 			if(i != nodes.Length - 1)
 			{
 				nc.NextNode = nodes[i + 1];
 				nc.UpdateVisual();
 			}
 
-			nc.NodeIndex = _nextNodeIndex++;
+			nc.NodeIndex = startIndex + i;
 			nodeObj.name = $"Node {nc.NodeIndex}";
 
 			_createdNodes.Add(nc);
@@ -99,6 +138,7 @@ public class LevelGenerator : Singleton<LevelGenerator>
 
 		// generate more nodes after the player reaches the node index 50% of the way through the generated nodes
 		_nextGenPoint = startIndex + Mathf.FloorToInt((_nextNodeIndex - startIndex) * 0.5f);
+		_nextNodeIndex = startIndex + nodes.Length;
 	}
 
 	private void Awake()
@@ -109,6 +149,8 @@ public class LevelGenerator : Singleton<LevelGenerator>
 		}
 		
 		_grid.Add(Vector2Int.zero);
+		_posIndexes[Vector2Int.zero] = 0;
+		_nextNodeIndex = 1;
 		Generate(new Vector2Int(0, 0), NumPerGenerate, true);
 	}
 

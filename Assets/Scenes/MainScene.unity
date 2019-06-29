@@ -243,7 +243,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 931499343}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.06, y: 0.15, z: 10}
+  m_LocalPosition: {x: -0.06, y: 0.15, z: 20}
   m_LocalScale: {x: 3.088866, y: 2.4823446, z: 2.4823446}
   m_Children: []
   m_Father: {fileID: 519420032}
@@ -309,6 +309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1718412947}
   - component: {fileID: 1718412948}
+  - component: {fileID: 1718412949}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -325,7 +326,7 @@ Transform:
   m_GameObject: {fileID: 1718412946}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 9.999999, y: 10, z: 1}
   m_Children: []
   m_Father: {fileID: 1990636833}
   m_RootOrder: 0
@@ -369,7 +370,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 99eeba660c24a1e49a94f43bdb204e91, type: 3}
+  m_Sprite: {fileID: -8415112055998964444, guid: b4d2b98f3a5278145b349ae43e7030b2,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -380,6 +382,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1718412949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718412946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c79272504448119a445b352844759f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MovementSprites:
+  - {fileID: -8415112055998964444, guid: b4d2b98f3a5278145b349ae43e7030b2, type: 3}
+  - {fileID: -7170124127345672535, guid: b4d2b98f3a5278145b349ae43e7030b2, type: 3}
+  - {fileID: -5458675613664692872, guid: b4d2b98f3a5278145b349ae43e7030b2, type: 3}
+  - {fileID: -6096083181160032784, guid: b4d2b98f3a5278145b349ae43e7030b2, type: 3}
+  - {fileID: -1600439499999899223, guid: b4d2b98f3a5278145b349ae43e7030b2, type: 3}
 --- !u!1 &1857867864
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,6 +430,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NodePrefab: {fileID: 2661578269070814332, guid: 967f663c0176d9a4bb7b5d5e4da971a9,
+    type: 3}
+  ObstaclePrefab: {fileID: 4879100975032373582, guid: 1fc9cb9e7969b6146aa3487d63de5e94,
     type: 3}
   WidthMult: 2.75
   HeightMult: 2.75
@@ -481,6 +503,7 @@ MonoBehaviour:
   AirResistance: 2
   BoostDuration: 0.5
   AltDelayTime: 1
+  SpriteHandler: {fileID: 1718412949}
 --- !u!4 &1990636833
 Transform:
   m_ObjectHideFlags: 0
