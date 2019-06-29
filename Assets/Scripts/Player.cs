@@ -1,5 +1,4 @@
-﻿using System;
-using DG.Tweening;
+﻿using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -68,6 +67,10 @@ public class Player : Singleton<Player>
 			_canJump = false;
 			_velocity = Vector2.zero;
 		}
+		else if(Input.GetKeyDown(KeyCode.Space))
+		{
+			AudioManager.Instance.PlayCantJump();
+		}
 
 		if(Input.GetKeyDown(KeyCode.R))
 		{
@@ -123,11 +126,12 @@ public class Player : Singleton<Player>
 			}
 
 			_canJump = true;
-			Destroy(other.gameObject);
+			nc.Kill();
 		}
 		else if(other.CompareTag("Obstacle"))
 		{
 			_boostTime = 0;
+			AudioManager.Instance.PlayHitWall();
 		}
 	}
 }

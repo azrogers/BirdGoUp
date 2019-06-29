@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class LevelGenerator : Singleton<LevelGenerator>
 {
@@ -21,6 +20,7 @@ public class LevelGenerator : Singleton<LevelGenerator>
 	private int _nextNodeIndex = 0;
 	private int _nextGenPoint = 0;
 	private Dictionary<Vector2Int, int> _posIndexes = new Dictionary<Vector2Int, int>();
+	private HashSet<int> _indexesWithObstacles = new HashSet<int>();
 
 	[NonSerialized] public int HighestNodeReached = 0;
 
@@ -99,19 +99,21 @@ public class LevelGenerator : Singleton<LevelGenerator>
 
 			foreach(var n in neighbors.Where(n => _grid.Contains(n) && n != nextNode && n != lastNodePos))
 			{
-				if(!(rand.NextDouble() > 0.5f))
+				var indexFrom = Mathf.Min(_posIndexes[node], _posIndexes[n]);
+				
+				if(rand.NextDouble() < 0.5f || _indexesWithObstacles.Contains(indexFrom))
 				{
 					continue;
 				}
 
-				var indexFrom = Mathf.Min(_posIndexes[node], _posIndexes[n]);
 				var obst = Instantiate(ObstaclePrefab, transform);
 				// position half way between
 				obst.transform.localPosition = Vector2.Lerp(GetPosFor(node), GetPosFor(n), 0.5f);
 				var oc = obst.GetComponent<Obstacle>();
 				oc.PosFrom = node;
 				oc.PosBlockingTo = n;
-				oc.IndexFrom = Mathf.Min(_posIndexes[node], _posIndexes[n]);
+				oc.IndexFrom = indexFrom;
+				_indexesWithObstacles.Add(indexFrom);
 			}
 		}
 

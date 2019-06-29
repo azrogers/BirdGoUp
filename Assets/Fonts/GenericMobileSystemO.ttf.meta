@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0f231c27c0913c348b08c70f3c659266
+guid: 845c30f3579330f4aaf82c7d3eb8eb6b
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: 8BIT WONDER
+  fontName: Generic Mobile System O
   fontNames:
-  - 8BIT WONDER
+  - Generic Mobile System O
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
