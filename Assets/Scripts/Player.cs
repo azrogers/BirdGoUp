@@ -116,6 +116,7 @@ public class Player : Singleton<Player>
 			var nc = other.GetComponent<Node>();
 			_gridPos = nc.GridPosition;
 			AudioManager.Instance.PlayCollect();
+			ScoreManager.Instance.HitNode(nc.NodeIndex);
 			if(nc.NodeIndex > LevelGenerator.Instance.HighestNodeReached)
 			{
 				LevelGenerator.Instance.HighestNodeReached = nc.NodeIndex;
