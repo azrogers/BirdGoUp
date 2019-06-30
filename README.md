@@ -7,3 +7,7 @@ A short platformer??? made in ~11 hours for the SIP Jam. More info [here](https:
 * https://commons.wikimedia.org/wiki/File:Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.JPG
 * https://opengameart.org/content/animated-bird-characters
 * https://freesound.org/people/zembacraftworks/sounds/427389/
+
+## License
+
+Code is MIT licensed. Assets listed above are licensed under their respective licenses. Music is CC-BY. Everything else is CC0.
