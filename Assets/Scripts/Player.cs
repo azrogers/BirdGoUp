@@ -131,6 +131,7 @@ public class Player : Singleton<Player>
 		else if(other.CompareTag("Obstacle"))
 		{
 			_boostTime = 0;
+			CameraControl.Instance.ShakeCamera(2.0f, 0.25f);
 			AudioManager.Instance.PlayHitWall();
 		}
 	}
