@@ -10,7 +10,7 @@ public class Player : Singleton<Player>
 	public float BoostDuration = 0.5f;
 	public float AltDelayTime = 0.5f;
 	public PlayerSpriteHandler SpriteHandler;
-	
+
 	private bool _firstJump = true;
 	private bool _canJump = true;
 	private Vector2 _velocity;
@@ -18,29 +18,28 @@ public class Player : Singleton<Player>
 	private Vector3 _boostStart;
 	private Vector3 _boostDest;
 	private float _boostTime;
+	private float _timeSinceLastHit = 0;
 
 	public bool FirstJump => _firstJump;
 
 	private void HandleJump()
 	{
-		if(_firstJump)
-		{
-			_firstJump = false;
-		}
-
 		var posChange = Vector2Int.zero;
 		if(Input.GetKey(KeyCode.W))
 		{
 			posChange += Vector2Int.up;
 		}
+
 		if(Input.GetKey(KeyCode.S))
 		{
 			posChange += Vector2Int.down;
 		}
+
 		if(Input.GetKey(KeyCode.A))
 		{
 			posChange += Vector2Int.left;
 		}
+
 		if(Input.GetKey(KeyCode.D))
 		{
 			posChange += Vector2Int.right;
@@ -50,6 +49,15 @@ public class Player : Singleton<Player>
 		{
 			return;
 		}
+
+		if(_firstJump)
+		{
+			_firstJump = false;
+		}
+
+		_canJump = false;
+		_velocity = Vector2.zero;
+		AudioManager.Instance.PlayWhoosh();
 
 		var newPos = _gridPos + posChange;
 		_boostStart = transform.localPosition;
@@ -63,18 +71,10 @@ public class Player : Singleton<Player>
 		if(_canJump && Input.GetKeyDown(KeyCode.Space))
 		{
 			HandleJump();
-			AudioManager.Instance.PlayWhoosh();
-			_canJump = false;
-			_velocity = Vector2.zero;
 		}
 		else if(Input.GetKeyDown(KeyCode.Space))
 		{
 			AudioManager.Instance.PlayCantJump();
-		}
-
-		if(Input.GetKeyDown(KeyCode.R))
-		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 
 		_velocity *= Vector2.one - (new Vector2(AirResistance, AirResistance) * Time.deltaTime);
@@ -89,6 +89,7 @@ public class Player : Singleton<Player>
 			{
 				rot = diff > 0.0f ? 1.0f : -1.0f;
 			}
+
 			SpriteHandler.UpdatePlayerRotation(rot);
 		}
 		else
@@ -96,6 +97,7 @@ public class Player : Singleton<Player>
 			if(!_firstJump)
 			{
 				_velocity -= new Vector2(0, Gravity) * Time.deltaTime;
+				_timeSinceLastHit += Time.deltaTime;
 			}
 
 			transform.Translate(_velocity);
@@ -105,11 +107,15 @@ public class Player : Singleton<Player>
 				Mathf.RoundToInt(localPosition.x / LevelGenerator.Instance.WidthMult),
 				Mathf.RoundToInt(localPosition.y / LevelGenerator.Instance.HeightMult)
 			);
-			
+
 			SpriteHandler.UpdatePlayerRotation(0.0f);
 		}
 
 		_boostTime -= Time.deltaTime;
+		if(_timeSinceLastHit > 3.0f)
+		{
+			GameManager.Instance.State = GameManager.GameState.Dead;
+		}
 	}
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -125,6 +131,7 @@ public class Player : Singleton<Player>
 				LevelGenerator.Instance.HighestNodeReached = nc.NodeIndex;
 			}
 
+			_timeSinceLastHit += Time.deltaTime;
 			_canJump = true;
 			nc.Kill();
 		}

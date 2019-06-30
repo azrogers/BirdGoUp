@@ -11,6 +11,10 @@ public class ScoreManager : Singleton<ScoreManager>
 	public RectTransform ComboContainer;
 	public int ScorePerNode = 100;
 	public int MaxCombo = 10;
+	
+	public int MaxDistance { get; private set; }
+
+	public int Score => _score;
 
 	private int _sequenceCombo = 0;
 	private int _score = 0;
@@ -52,6 +56,7 @@ public class ScoreManager : Singleton<ScoreManager>
 		ComboText.text = $"SEQUENCE COMBO\nx{_sequenceCombo}";
 		var playerDistance = Mathf.FloorToInt(Player.Instance.transform.position.y - _playerStartY);
 		DistanceText.text = $"{playerDistance * 100}m";
+		MaxDistance = Mathf.Max(playerDistance * 100, MaxDistance);
 
 		if(_sequenceCombo > 1 && !_comboShown)
 		{
