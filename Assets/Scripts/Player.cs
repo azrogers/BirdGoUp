@@ -112,7 +112,7 @@ public class Player : Singleton<Player>
 		}
 
 		_boostTime -= Time.deltaTime;
-		if(_timeSinceLastHit > 3.0f)
+		if(_timeSinceLastHit > 2.0f)
 		{
 			GameManager.Instance.State = GameManager.GameState.Dead;
 		}
@@ -131,7 +131,7 @@ public class Player : Singleton<Player>
 				LevelGenerator.Instance.HighestNodeReached = nc.NodeIndex;
 			}
 
-			_timeSinceLastHit += Time.deltaTime;
+			_timeSinceLastHit = 0;
 			_canJump = true;
 			nc.Kill();
 		}
